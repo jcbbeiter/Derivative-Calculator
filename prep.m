@@ -9,8 +9,7 @@ function strOut = prep(str)
 str = lower([str,'   ']);
 
 % set of characters that are valid on their own (not as part of functions)
-validChars = ['1','2','3','4','5','6','7','8','9','0',...
-    '+','-','*','/','^','(',')','x','e',' '];
+validChars = '1234567890+-*/^()xe ';
 
 %% Scans for invalid characters
 iChar = 1;
@@ -74,10 +73,9 @@ end
 
 %% Cleans up string
 % Inserts a * operator if there is implicit parenthetical multiplication
-% i.e., an open paren, function character, or x preceded by a close paren or a digit
+% i.e., an open paren, function, or x preceded by a close paren or a digit
 for iChar = 2:length(str)-1
-    if((any(str(iChar) == ['(','x','s','c','t','S','C','T','g','L','q']))...
-            && (str(iChar-1) == 'e'...
+    if((any(str(iChar) == '(xsctSCTgLq')) && (str(iChar-1) == 'e'...
             || isDigit(str(iChar-1)) || str(iChar-1) == ')'))
         str = [str(1:iChar-1),'*',str(iChar:length(str))];
     end
@@ -117,7 +115,7 @@ for iChar = 2:length(str)
     end
     
     % Operator can be followed by the unary operator '-'
-    if(isChar(char,['+','*','/','^']) && isChar(prevChar,['+','-','*','/','^']))
+    if(any(char == '+*/^') && any(prevChar == '+-*/^'))
         strOut = ['&No argument between operators ''',char,''' and ''',...
             prevChar,'''.'];
         return;
@@ -128,13 +126,13 @@ for iChar = 2:length(str)
         return;
     end
     
-    if(char == ')' && isChar(prevChar,['+','-','*','/','^']))
+    if(char == ')' && any(prevChar == '+-*/^'))
         strOut = '&An operator cannot be followed by close parentheses';
         return;
     end
     
     % Open parentheses can be followed by the unary operator '-'
-    if(prevChar == '(' && isChar(char,['+','*','/','^']))
+    if(prevChar == '(' && any(char == '+*/^'))
         strOut = '&Open parentheses cannot be followed by an operator';
         return;
     end;

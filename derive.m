@@ -49,7 +49,7 @@ ops = NaN(1,length(str));
 % Searches operators of the string and records how many parentheses they
 % are surrounded by to calculate precedence
 for iChar = 1:length(str)
-    if(isChar(str(iChar),['+','-','*','/','^']))
+    if(any(str(iChar) == '+-*/^'))
         ops(iChar) = levels(iChar);
     end
 end
