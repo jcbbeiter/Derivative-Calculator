@@ -9,28 +9,30 @@ function strOut = prep(str)
 str = lower([str,'   ']);
 
 % set of characters that are valid on their own (not as part of functions)
-validChars = '1234567890+-*/^()xe ';
+validChars = '.1234567890+-*/^()xe ';
 
 %% Scans for invalid characters
 iChar = 1;
 % use a while loop so we can control the incrementation
 while(iChar < length(str))
     char = str(iChar);
-    if(any(char == validChars)) % if char matches an element of validChars
+    
+    % early catch if character is in the valid char array
+    if(any(char == validChars)) 
         iChar = iChar + 1;
         continue;
     end
     
+    % checks to see if character is start of a multi-character function
     shift = isFunc(str,iChar);
-    
     % shift = 0 is the error case for isFunc, so would evaluate to false if
     % no function
     if(shift)
-        if(str(iChar+shift) ~= '(')
+        if(str(iChar+shift) ~= '(' && str(iChar) ~= 'p')
             strOut = ['&Function ''',str(iChar:iChar+shift-1),...
                 ''' must be followed by parentheses'];
             return;
-        elseif(strcmp(str(iChar+shift:iChar+shift+1),'()'))
+        elseif(strcmp(str(iChar+shift:iChar+shift+1),'()') && str(iChar) ~= p)
             strOut = ['&Function ''',str(iChar:iChar+shift-1),...
                 ''' has no arguments'];
             return;
@@ -56,6 +58,8 @@ while(iChar < length(str))
                 funcChar = 'L';
             case 'log'
                 funcChar = 'g';
+            case 'pi'
+                funcChar = 'p';
         end
         % Sets unique character
         str(iChar) = funcChar;
@@ -75,8 +79,7 @@ end
 % Inserts a * operator if there is implicit parenthetical multiplication
 % i.e., an open paren, function, or x preceded by a close paren or a digit
 for iChar = 2:length(str)-1
-    if((any(str(iChar) == '(xsctSCTgLq')) && (str(iChar-1) == 'e'...
-            || isDigit(str(iChar-1)) || str(iChar-1) == ')'))
+    if((any(str(iChar) == '(xsctSCTgLq')) && any(str(iChar-1) == 'ep1234567890)'))
         str = [str(1:iChar-1),'*',str(iChar:length(str))];
     end
 end
@@ -104,7 +107,7 @@ end
 
 %% Scans for invalid character combinations
 % Operators next to operators, empty parentheses, multiple adjacent x's,
-% operators before close parentheses or after open parentheses, e after x
+% operators before close parentheses or after open parentheses, e or p after x
 for iChar = 2:length(str)
     char = str(iChar);
     prevChar = str(iChar-1);
@@ -143,6 +146,12 @@ for iChar = 2:length(str)
         return;
     end;
     
+    % 'xp' is invalid, but 'px' is valid
+    if(char == 'p' && prevChar == 'x')
+        strOut = '&Operator required between ''x'' and ''pi''';
+        return;
+    end;
+    
 end
 
 %% Makes sure open and close parentheses counts match
@@ -161,6 +170,39 @@ if(parens(1,1) > parens(1,2))
 elseif(parens(1,1) < parens(1,2))
     strOut = '&Unmatched close parentheses';
     return;
+end
+
+%% Makes sure decimal points are used properly
+% A decimal point is valid only if it is followed immediately by a digit
+% There must be at least one operator between two decimal points
+
+% Array containing the indices of all the decimal points
+indices = find(str == '.');
+
+% Catches if decimal point is not followed by digit, or is end of string
+for i = 1:length(indices)
+    iChar = indices(i);
+    if(iChar == length(str) || ~any(str(iChar+1) == '1234567890'))
+        strOut = '&Decimal points must be followed by at least one digit';
+        return;
+    end
+end
+
+% Makes sure there's an operator between decimal points
+for i = 1:length(indices)-1 % checks strings between each decimal point
+    iFirst = indices(i);
+    iSecond = indices(i+1);
+    strBetween = str(iFirst:iSecond);
+    
+    % runs through string between points to make sure there's an operator
+    for k = 1:length(strBetween) 
+        if(any(k == '+-*/^'))
+            continue;
+        end
+        
+        strOut = '&Multiple decimal points in one number are not permitted';
+        return;
+    end   
 end
 
 %% Returns successfully

@@ -10,6 +10,12 @@ if(strcmp(str(iChar:iChar+1),'ln')) % L
     return;
 end
 
+% check for pi
+if(strcmp(str(iChar:iChar+1),'pi')) % p
+    shift = 2;
+    return;
+end
+
 % check for sqrt
 if(strcmp(str(iChar:iChar+3),'sqrt')) % q
     shift = 4;
