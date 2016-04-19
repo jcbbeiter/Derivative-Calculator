@@ -2,6 +2,7 @@ function strOut = derive(str)
 % Recursive function to differentiate mathematical expressions
 % String should be processed with prep() before being passed to this
 % function
+% meaningless edit
 
 %% Removes parentheses that surround entire expression
 % Creates a vector to store how "deep" in parentheses each character is
