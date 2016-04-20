@@ -32,7 +32,7 @@ while(iChar < length(str)-1)
         end
         % inserts function string
         str = [str(1:iChar-1),func,str(iChar+1:length(str))];
-        iChar = iChar + length(func) - 1;
+        iChar = iChar + length(func);
     end 
     iChar = iChar + 1;
 end

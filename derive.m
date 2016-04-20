@@ -2,7 +2,11 @@ function strOut = derive(str)
 % Recursive function to differentiate mathematical expressions
 % String should be processed with prep() before being passed to this
 % function
-% meaningless edit
+
+% bad hack for fixing statements with a leading unary '-' operator
+if(str(1) == '-')
+    str = ['0',str];
+end
 
 %% Removes parentheses that surround entire expression
 % Creates a vector to store how "deep" in parentheses each character is
@@ -276,7 +280,7 @@ if(indices) % Runs if index is not blank, i.e., if there is a ^
            strOut = ['(','L(',arg1,')*',str,'*',derive(arg2),')'];
            return;
        case '10'
-           strOut = ['(',arg2,'*',arg1,'^(',arg2,'-1))'];
+           strOut = ['(',arg2,'*',derive(arg1),'*',arg1,'^(',arg2,'-1))'];
            return;
        case '11'
            strOut = ['(',str,'*',derive(['L(',arg1,')*',arg2]),')'];

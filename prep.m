@@ -4,6 +4,14 @@ function strOut = prep(str)
 % If invalid, returns a '&' followed by an error message
 % Removes spaces, adds * for implicit parenthetical multiplication, etc.
 
+
+%% Check for blank string
+if(isempty(str))
+    strOut = '&Error: no input';
+    return;
+end
+
+
 % adds blank space to make checking for trig functions not have to check
 % bounds of string, will be removed later anyway
 str = lower([str,'   ']);
@@ -32,7 +40,7 @@ while(iChar < length(str))
             strOut = ['&Function ''',str(iChar:iChar+shift-1),...
                 ''' must be followed by parentheses'];
             return;
-        elseif(strcmp(str(iChar+shift:iChar+shift+1),'()') && str(iChar) ~= p)
+        elseif(strcmp(str(iChar+shift:iChar+shift+1),'()') && str(iChar) ~= 'p')
             strOut = ['&Function ''',str(iChar:iChar+shift-1),...
                 ''' has no arguments'];
             return;
