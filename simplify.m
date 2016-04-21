@@ -94,7 +94,7 @@ for i = 0:lvl
         start = pars(2*j-1) + 1;                % parentheses on this level by using 2*j-1 to get all of
         stop = pars(2*j) - 1;                   % the odd-numbered parentheses and 2*j to get the evens
         if isSimple(str(start:stop))            % tests to see if the string is easily evaluable mathematically
-            str = [str(1:start-2), evalString(str(start:stop)),...  % (that is, it contains only numbers)
+            str = [str(1:start-2), num2str(str(start:stop)),...  % (that is, it contains only numbers)
                 str(stop+2:end)];                                   % if it is, it evaluates it
         end
     end
@@ -194,7 +194,7 @@ for i = 1:length(ops)                   % runs through each operation one at a t
                         break;
                     end
                 end
-                newExp = evalString(str(firstnum:secndnum));                % then if it is evaluable, we evaluate it,
+                newExp = num2str(str(firstnum:secndnum));                % then if it is evaluable, we evaluate it,
                 str = [str(1:firstnum-1),...                                % making sure to add in an appropriate
                     blanks(((secndnum+1)-(firstnum-1))-length(newExp)),...  % number of spaces such that the string
                     newExp, str(secndnum+1:end)];                           % stays the same length
