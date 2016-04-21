@@ -246,7 +246,7 @@ if(indices) % Runs if index is not blank, i.e., if there is a /
            return;
        case '11'
            strOut = ['((',denom,'*',derive(num),'-',num,'*',derive(denom),...
-               ')/',denom,'^2)'];
+               ')/(',denom,'^2))'];
            return;
     end   
 end
