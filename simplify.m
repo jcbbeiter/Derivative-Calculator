@@ -42,6 +42,9 @@ while ~complete
                 if (i-1) > 0 && any(str(i-1) == funcs)    % replaces parentheses used to denote functions
                     str(i) = '[';                         % with square brackets so they will be treated
                     str(i + nxtclose(1)) = ']';           % differently
+                elseif (i-1) > 0 && str(i-1) == '^'           % replaces parentheses around exponents with curly
+                    str(i) = '{';                             % braces so they will be treated differently as well
+                    str(i + nxtclose(1)) = '}';               % this is for latexify, mainly
                 else
                     str(i) = char(minchar + lvl);               % changes parentheses to the ASCII char
                     str(i + nxtclose(1)) = char(minchar + lvl); % corresponding to the current level
@@ -68,6 +71,7 @@ while ~complete
     end                         % the level of the parentheses
 end
 
+disp(str);
 %% solves simple mathematical expressions within parentheses
 % 'simple mathematical expressions' in this context is defined as anything
 % that is only composed of numbers and operators and can be easily
