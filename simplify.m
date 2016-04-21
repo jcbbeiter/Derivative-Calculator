@@ -6,6 +6,13 @@ function strOut = simplify(str)
 % author: Sam Berning
 % version: 2.0
 
+if(str(1)=='!')
+    recurse = false;
+    str = str(2:length(str));
+else
+    recurse = true;
+end
+
 %% replaces x/x with 1
 % this is an easy simplification to implement, so we just take care of it
 % at the beginning.
@@ -187,12 +194,18 @@ end
 % these strings nullify whole expressions, so we can scan to see how long
 % they propogate. In general, they go until there is a term that is added
 % or subtracted, though that's not how the scanning works
-
+complete = false;
+while(~complete)
+   str = strrep(str,'(0)','0');
 % runs while any '*0' is left in the string
 while(any(strfind(str,'*0')))
 pos = strfind(str,'*0');
 pos = pos(length(pos));
 start = pos-1;
+if(isDigit(pos+1))
+    str(pos)='!';
+    continue;
+end
 while(true) % scans backwards for end of expression nullified
     if(start == 0)% exits at start of string
         start = 1;
@@ -229,13 +242,20 @@ while(any(strfind(str,'0*'))|| any(strfind(str,'0/')))
 pos = [strfind(str,'0*'),strfind(str,'0/')];
 pos = pos(length(pos));
 ending = pos+1;
+if(isDigit(str(pos-1)))
+    if(str(pos+1)=='*')
+        str(pos+1)='!';
+    else
+        str(pos+1)='#';
+    end
+end
 while(true)
     if(ending == length(str)+1) % ends selection if at end of string
         ending = length(str);
         break;
     end
     % continues past any of these characters
-    if(any(str(ending)=='1234567890x*/')) 
+    if(any(str(ending)=='1234567890x*/^')) 
         ending = ending+1;
         continue;
     % scan backwards to the matching close paren
@@ -261,6 +281,13 @@ end
 str = [str(1:pos),str(ending+1:length(str))];
 end
 
+if(isempty(strfind(str,'(0)')))
+    complete = true;
+end
+
+end
+str=strrep(str,'!','*');
+str=strrep(str,'#','/');
 %% removes identity statements
 % identity statements such as +0, *1, and ^1 clutter up the expression
 % unnecessarily. this portion of code removes them with a series of simple
@@ -277,12 +304,24 @@ for j = 1:2
     str = strrep(str,'-0','');
 end
 
+complete = false;
+
+if(recurse)
+while ~complete
+    prevstr = str;
+    str = simplify(['!',str]);
+    if strcmp(prevstr,str)
+        complete = true;
+    end
+end
+end
+
 %% makes function names readable
 % prep.m and derive.m use one letter to represent functions like sin, cos,
 % ln, and square root. in order to make this readable to the user, we must
 % change them back to their normal forms. luckily, this is very easy - it
 % is simply a series of 'strrep' statements
-
+if(recurse)
 str = strrep(str, 's', 'sin');
 str = strrep(str, 'c', 'cos');
 str = strrep(str, 't', 'tan');
@@ -293,6 +332,7 @@ str = strrep(str, 'L', 'ln');
 str = strrep(str, 'g', 'log');
 str = strrep(str, 'q', 'sqrt');
 str = strrep(str, 'p', 'pi');
+end
 
 %% returns simplified function
 
