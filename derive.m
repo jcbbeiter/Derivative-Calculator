@@ -2,6 +2,7 @@ function strOut = derive(str)
 % Recursive function to differentiate mathematical expressions
 % String should be processed with prep() before being passed to this
 % function
+% author: Jacob Beiter
 
 % bad hack for fixing statements with a leading unary '-' operator
 if(str(1) == '-')
@@ -104,7 +105,7 @@ if(isempty(opChars))
             strOut = ['(-s',funcArg,'*',derive(funcArg),')'];
             return;
         case 't'
-            strOut = ['((S',funcArg,')^2*',derive(funcArg),')'];
+            strOut = ['(((S',funcArg,')^2)*',derive(funcArg),')'];
             return;
         case 'S'
             strOut = ['(S',funcArg,'*t',funcArg,'*',derive(funcArg),')'];
@@ -140,7 +141,7 @@ indices = pos(opChars == '+');
 
 if(indices) % Runs if index is not blank, i.e., if there is a plus
    index = indices(1); % Only pays attention to the first index
-   strOut = [derive(str(1:index-1)),'+',derive(str(index+1:length(str)))];
+   strOut = ['(',derive(str(1:index-1)),'+',derive(str(index+1:length(str))),')'];
    return;
 end
  
@@ -169,7 +170,7 @@ end
 
 % will only execute if for loop found something
 if(index)
-    strOut = [derive(str(1:index-1)),'-',derive(str(index+1:length(str)))];
+    strOut = ['(',derive(str(1:index-1)),'-',derive(str(index+1:length(str))),')'];
     return;    
 end
 
@@ -238,7 +239,7 @@ if(indices) % Runs if index is not blank, i.e., if there is a /
            strOut = '0';
            return;
        case '01'
-           strOut = ['(',num,'*',derive(['(',denom,')^(-1)']),')'];
+           strOut = ['(',num,'*',derive(['(',denom,')^-1']),')'];
            return;
        case '10'
            strOut = ['(',derive(num),'/',denom,')'];
@@ -292,12 +293,3 @@ end
 % The program should never reach this point. If it does, something's gone
 % wrong
 strOut = '¯\_(?)_/¯';
-
-
-
-
-
-
-
-
-
