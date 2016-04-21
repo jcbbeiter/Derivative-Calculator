@@ -5,13 +5,24 @@ function strOut = simplify(str)
 % back to readable form
 % author: Sam Berning
 % version: 2.0
-
 if(str(1)=='!')
     recurse = false;
     str = str(2:length(str));
 else
     recurse = true;
 end
+
+for iChar = 1:length(str)
+    if(str(iChar)=='^' && (str(iChar+1) ~= '(' && str(iChar+1) ~= '{'))
+        for i = iChar:length(str)
+            if any(str(i) == '+-()/*')
+                break;
+            end
+        end
+        str = [str(1:iChar),'(',str(iChar+1:i-1),')',str(i:length(str))];
+    end
+end
+
 
 %% replaces x/x with 1
 % this is an easy simplification to implement, so we just take care of it
@@ -71,7 +82,6 @@ while ~complete
     end                         % the level of the parentheses
 end
 
-disp(str);
 %% solves simple mathematical expressions within parentheses
 % 'simple mathematical expressions' in this context is defined as anything
 % that is only composed of numbers and operators and can be easily

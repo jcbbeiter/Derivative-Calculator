@@ -3,6 +3,7 @@ function strOut = prep(str)
 % Returns the prepared string if valid
 % If invalid, returns a '&' followed by an error message
 % Removes spaces, adds * for implicit parenthetical multiplication, etc.
+% author: Jacob Beiter
 
 
 %% Check for blank string
@@ -86,10 +87,19 @@ end
 %% Cleans up string
 % Inserts a * operator if there is implicit parenthetical multiplication
 % i.e., an open paren, function, or x preceded by a close paren or a digit
-for iChar = 2:length(str)-1
-    if((any(str(iChar) == '(xsctSCTgLq')) && any(str(iChar-1) == 'ep1234567890)'))
+% for iChar = 2:length(str)
+%     if((any(str(iChar) == '(xsctSCTgLq')) && any(str(iChar-1) == 'ep1234567890)'))
+%         str = [str(1:iChar-1),'*',str(iChar:length(str))];
+%     end
+% end
+
+iChar = 2;
+while(iChar <=length(str))
+    if(any(str(iChar-1) == 'ep1234567890x)') && (any(str(iChar) == '(xsctSCTgLq'))...
+            && ~(strcmp([str(iChar-1:iChar)],'xx')))
         str = [str(1:iChar-1),'*',str(iChar:length(str))];
     end
+    iChar = iChar+1;
 end
 
 % Combines pluses and minuses (e.g. x+(-2) or x-(-2)
@@ -122,6 +132,11 @@ for iChar = 2:length(str)
     
     if(char == 'x' && prevChar == 'x')
         strOut = '&Must have an operator between adjacent variables.';
+        return;
+    end
+    
+    if(any(char == '1234567890') && prevChar == 'x')
+        strOut = ['&Must have an operator between x and digit ',char,'.'];
         return;
     end
     
