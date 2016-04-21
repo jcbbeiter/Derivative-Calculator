@@ -105,7 +105,7 @@ if(isempty(opChars))
             strOut = ['(-s',funcArg,'*',derive(funcArg),')'];
             return;
         case 't'
-            strOut = ['(((S',funcArg,')^2)*',derive(funcArg),')'];
+            strOut = ['(((S',funcArg,')^(2))*',derive(funcArg),')'];
             return;
         case 'S'
             strOut = ['(S',funcArg,'*t',funcArg,'*',derive(funcArg),')'];
