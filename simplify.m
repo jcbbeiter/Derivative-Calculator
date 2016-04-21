@@ -3,15 +3,8 @@ function strOut = simplify(str)
 % simple mathematical equations found in the expression, removing indentity
 % statements, removing unnecessary parentheses, and changing function names
 % back to readable form
-% author: Sam Berning
-% version: 2.0
-if(str(1)=='!')
-    recurse = false;
-    str = str(2:length(str));
-else
-    recurse = true;
-end
 
+startstr = str;
 for iChar = 1:length(str)
     if(str(iChar)=='^' && (str(iChar+1) ~= '(' && str(iChar+1) ~= '{'))
         for i = iChar:length(str)
@@ -94,7 +87,7 @@ for i = 0:lvl
         start = pars(2*j-1) + 1;                % parentheses on this level by using 2*j-1 to get all of
         stop = pars(2*j) - 1;                   % the odd-numbered parentheses and 2*j to get the evens
         if isSimple(str(start:stop))            % tests to see if the string is easily evaluable mathematically
-            str = [str(1:start-2), num2str(str(start:stop)),...  % (that is, it contains only numbers)
+            str = [str(1:start-2), evalString(str(start:stop)),...  % (that is, it contains only numbers)
                 str(stop+2:end)];                                   % if it is, it evaluates it
         end
     end
@@ -194,7 +187,7 @@ for i = 1:length(ops)                   % runs through each operation one at a t
                         break;
                     end
                 end
-                newExp = num2str(str(firstnum:secndnum));                % then if it is evaluable, we evaluate it,
+                newExp = evalString(str(firstnum:secndnum));                % then if it is evaluable, we evaluate it,
                 str = [str(1:firstnum-1),...                                % making sure to add in an appropriate
                     blanks(((secndnum+1)-(firstnum-1))-length(newExp)),...  % number of spaces such that the string
                     newExp, str(secndnum+1:end)];                           % stays the same length
@@ -318,24 +311,12 @@ for j = 1:2
     str = strrep(str,'-0','');
 end
 
-complete = false;
-
-if(recurse)
-while ~complete
-    prevstr = str;
-    str = simplify(['!',str]);
-    if strcmp(prevstr,str)
-        complete = true;
-    end
-end
-end
-
 %% makes function names readable
 % prep.m and derive.m use one letter to represent functions like sin, cos,
 % ln, and square root. in order to make this readable to the user, we must
 % change them back to their normal forms. luckily, this is very easy - it
 % is simply a series of 'strrep' statements
-if(recurse)
+
 str = strrep(str, 's', 'sin');
 str = strrep(str, 'c', 'cos');
 str = strrep(str, 't', 'tan');
@@ -346,8 +327,18 @@ str = strrep(str, 'L', 'ln');
 str = strrep(str, 'g', 'log');
 str = strrep(str, 'q', 'sqrt');
 str = strrep(str, 'p', 'pi');
+
+syms x
+
+notSimplified = addFuncs(startstr);
+Simplified = str;
+
+expression = sym(notSimplified);
+expression2 = sym(Simplified);
+
+if isequaln(expression,expression2)
+    strOut = str;
+else
+    strOut = addFuncs(startstr);
+    disp('simplify failed')
 end
-
-%% returns simplified function
-
-strOut = str;
